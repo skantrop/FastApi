@@ -5,16 +5,19 @@ from typing import List
 
 class User(BaseModel):
     id: int
-    name: str
+    username: str
 
 
 class UploadVideo(BaseModel):
     title: str
     description: str
 
+
 class GetVideo(BaseModel):
     user: User
-    video: UploadVideo
+    title: str
+    description: str
+
 
 class Message(BaseModel):
     message: str
