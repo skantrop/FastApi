@@ -1,37 +1,11 @@
-# #1. импортируем из fastapi класс FastAPI
-# from fastapi import FastAPI
-#
-# #создаем объект FastAPI
-# app = FastAPI()
-#
-#
-# # строим функции(эндпоинты) основываясь на объекте
-# # (декоратор на имя нашего объекта, метод HTTP, (указываем адрес(url))
-# @app.get("/")
-# async def root():
-#     return {"message": "hi"}
-#
-
-
-from fastapi import FastAPI, UploadFile, File
-# с помощью библиотеки shutil можно сохранять файлы
-import shutil
+from fastapi import FastAPI
+from api import video_router
 
 
 app = FastAPI()
 
-@app.post("/")
-async def upload_video(file: UploadFile = File(...)):
-    #перезаписываем загружаемый файл для его сохранения
-    with open(f"{file.filename}", "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"file_name": file.filename}
+# подключаем router который находиться в файле app
+# чтобы функции прописанные там работали и FastAPI их мог обрабатывать
+# таким образом мы подключили эти url к основному приложению
+app.include_router(video_router)
 
-from typing import List
-
-@app.post("/image")
-async def upload_image(files: List[UploadFile] = File(...)):
-    for image in files:
-        with open(f"{image.filename}", "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-    return {"hello": "world!"}
