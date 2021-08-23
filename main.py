@@ -28,4 +28,3 @@ async def shutdown() -> None:
 # чтобы функции прописанные там работали и FastAPI их мог обрабатывать
 # таким образом мы подключили эти url к основному приложению
 app.include_router(video_router)
-
