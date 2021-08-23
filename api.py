@@ -6,11 +6,10 @@ from fastapi import Request
 # импортируем модели ormar
 from models import Video, User
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from services import write_video
+from services import save_video
 
 
-# с помощью библиотеки shutil можно сохранять файлы
-import shutil
+
 
 from typing import List
 
@@ -23,26 +22,14 @@ video_router = APIRouter()
 # и валидировали данные)
 @video_router.post("/")
 async def create_video(
-        background_tasks: BackgroundTasks,
+        back_tasks: BackgroundTasks,
         title: str = Form(...),
         description: str = Form(...),
         file: UploadFile = File(...)
 ):
     # директория куда будут аплоудиться видеофайлы
-    file_name = f"media/{file.filename}"
-    # проверка формата видео, в случает если это не mp4 забрасывается ошибка
-    if file.content_type == "video/mp4":
-        # такс который выполняется на заднем фоне приложения
-        background_tasks.add_task(write_video, # ф-ция сохраняющая видео
-                                  file_name, # путь к директории в которой файл будет сохраняться
-                                  file # сохраняемый файл
-                                  )
-    else:
-        raise HTTPException(status_code=418, detail="It isn't mp4")
-    # перезаписываем загружаемый файл для его сохранения
-    info = UploadVideo(title=title, description=description)
     user = await User.objects.first()
-    return await Video.objects.create(file=file_name, user=user, **info.dict())
+    return await save_video(user, file, title, description, back_tasks)
 
 
 # !!!! создаем запрос используя модели ormar !!!
