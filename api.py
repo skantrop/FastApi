@@ -7,12 +7,16 @@ from fastapi import Request
 from models import Video, User
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from services import save_video
-
+from starlette.templating import Jinja2Templates
+from starlette.responses import StreamingResponse, HTMLResponse
 
 
 
 from typing import List
 
+
+# # подключение шабонов и указывание директории
+templates = Jinja2Templates(directory="templates")
 
 # класс APIRouter похож на класс FastAPI но он предназначен для построения route
 video_router = APIRouter()
@@ -67,3 +71,7 @@ async def main():
     return StreamingResponse(fake_video_streamer())
 
 
+# воспроизведение видео
+@video_router.get("/index/{video_pk}", response_class=HTMLResponse)
+async def get_video(request: Request, video_pk: int):
+    return templates.TemplateResponse("index.html", {"request": request, "path": video_pk})
